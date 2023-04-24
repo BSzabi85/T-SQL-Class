@@ -72,3 +72,5 @@ from Purchasing.PurchaseOrderHeader PpoH
 		on PpoH.EmployeeID=Pp.BusinessEntityID
 	join Person.EmailAddress Pe
 		on Pp.BusinessEntityID=Pe.BusinessEntityID;
+		
+		
