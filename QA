@@ -1,0 +1,94 @@
+If not exists (Select 1 From sys.objects Where type = 'P' And name = 'uspAddPersonTables')
+Begin
+	Exec('
+	Create Procedure uspAddPersonTables
+	As 
+	Begin
+
+	If not exists (Select 1 From INFORMATION_SCHEMA.SCHEMATA Where SCHEMA_NAME = ''Person'')
+		Begin
+			Exec (''Create Schema Person Authorization dbo'');
+		End;
+
+	Create Table Person.[Type]
+		(
+		TypeID Tinyint Primary Key Identity(1,1) not NULL,
+		TypeName NVarchar(64) not NULL,
+		DateModified DateTime not NULL
+		);
+
+	Create Table Person.ContactName
+		(
+		ContactID Int Primary Key Identity(1,1) not NULL,
+		ContactName NVarchar(256) not NULL,
+		DateModified DateTime not NULL
+		);
+	
+	Create Table Person.Person
+		(
+		PersonID Int Primary Key Identity(1,1) not NULL,
+		PersonType Tinyint not NULL,
+		FirstName NVarchar(50) not NULL,
+		MiddleName NVarchar(50) NULL,
+		LastName NVarchar(50) not NULL,
+		PNN NVarchar(13) not NULL,
+		DateModified Datetime not NULL,
+		Foreign Key (PersonType) References Person.Type(TypeID)
+		);
+
+	Create Table Person.Address
+		(
+		AddressID Int Primary Key Identity(1,1) not NULL,
+		PersonID Int not NULL,
+		AddressLine1 NVarchar(512) NULL,
+		AddressLine2 NVarchar(512) NULL,
+		City NVarchar(128) NULL,
+		Province NVarchar(64) NULL,
+		PostalCode NVarchar(30) NULL,
+		DateModified DateTime not NULL,
+		Foreign Key (PersonID) References Person.Person(PersonID)
+		);
+	
+	Create Table Person.Phone
+		(
+		PhoneID Int Primary Key Identity(1,1) not NULL,
+		PersonID Int not NULL,
+		ContactID Int not NULL,
+		PhoneNO NVarchar(15) NULL,
+		DateModified DateTime not NULL,
+		Foreign Key (PersonID) References Person.Person(PersonID),
+		Foreign Key (ContactID) References Person.ContactName(ContactID)
+		);
+	
+	Create Table Person.Email
+		(
+		EmailID Int Primary Key Identity(1,1) not NULL,
+		PersonID Int not NULL,
+		ContactID Int not NULL,
+		EmailAddress NVarchar(256) NULL,
+		DateModified Datetime not NULL,
+		Foreign Key (PersonID) References Person.Person(PersonID),
+		Foreign Key (ContactID) References Person.ContactName(ContactID)
+		);
+
+	Create Table Person.Login
+		(
+		LoginID Int Primary Key Identity(1,1) not NULL,
+		PersonID Int not NULL,
+		UserName NVarchar(32) not NULL,
+		PasswordHash Varchar(64) not NULL,
+		DateModified DateTime not NULL,
+		Foreign Key (PersonID) References Person.Person(PersonID)
+		);
+	
+	
+	End;
+	');
+	Print '"uspAddPersonTables" procedure successfully created.';
+End;
+Else
+Begin
+	Print '"uspAddPersonTables" procedure already exists.'
+End;
+
+GO
